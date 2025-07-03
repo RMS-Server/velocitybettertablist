@@ -1,98 +1,94 @@
 package net.rms.velocitytablist.handler;
 
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
+import net.rms.velocitytablist.VelocityTabListPlugin;
 import net.rms.velocitytablist.config.TabListConfig;
 import net.rms.velocitytablist.manager.CrossServerInfoManager;
-import net.rms.velocitytablist.util.PacketInterceptor;
-import org.slf4j.Logger;
+import net.rms.velocitytablist.util.TabListUpdater;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class TabListPacketHandler {
     
+    private final VelocityTabListPlugin plugin;
     private final ProxyServer server;
-    private final CrossServerInfoManager crossServerManager;
     private final TabListConfig config;
-    private final Logger logger;
+    private final CrossServerInfoManager infoManager;
     
-    private final ConcurrentMap<Player, PacketInterceptor> playerInterceptors = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Player, TabListUpdater> playerUpdaters = new ConcurrentHashMap<>();
     
-    public TabListPacketHandler(ProxyServer server, CrossServerInfoManager crossServerManager,
-                               TabListConfig config, Logger logger) {
+    public TabListPacketHandler(VelocityTabListPlugin plugin, ProxyServer server, 
+                              TabListConfig config, CrossServerInfoManager infoManager) {
+        this.plugin = plugin;
         this.server = server;
-        this.crossServerManager = crossServerManager;
         this.config = config;
-        this.logger = logger;
+        this.infoManager = infoManager;
     }
     
     @Subscribe
-    public void onPlayerServerConnect(ServerPostConnectEvent event) {
+    public void onPostLogin(PostLoginEvent event) {
         Player player = event.getPlayer();
         
-        if (!config.isCrossServerEnabled()) {
-            return;
-        }
-        
-        try {
-            // 为每个玩家创建数据包拦截器
-            PacketInterceptor interceptor = new PacketInterceptor(
-                    player, 
-                    crossServerManager, 
-                    config, 
-                    logger
-            );
+        if (config.isCrossServerEnabled()) {
+            // 为玩家创建Tab列表更新器
+            TabListUpdater updater = new TabListUpdater(player, plugin, infoManager);
+            playerUpdaters.put(player, updater);
             
-            playerInterceptors.put(player, interceptor);
-            
-            // 注册数据包拦截
-            interceptor.register();
-            
-            logger.debug("为玩家 {} 创建了数据包拦截器", player.getUsername());
-            
-        } catch (Exception e) {
-            logger.error("为玩家 {} 创建数据包拦截器时发生错误", player.getUsername(), e);
+            // 延迟初始化Tab列表
+            server.getScheduler().buildTask(plugin, () -> updater.updateTabList())
+                .delay(java.time.Duration.ofSeconds(1))
+                .schedule();
         }
     }
     
     @Subscribe
-    public void onPlayerDisconnect(com.velocitypowered.api.event.connection.DisconnectEvent event) {
+    public void onServerConnect(ServerPostConnectEvent event) {
         Player player = event.getPlayer();
         
-        // 清理数据包拦截器
-        PacketInterceptor interceptor = playerInterceptors.remove(player);
-        if (interceptor != null) {
-            interceptor.unregister();
-            logger.debug("为玩家 {} 清理了数据包拦截器", player.getUsername());
-        }
-    }
-    
-    @Subscribe
-    public void onPluginMessage(PluginMessageEvent event) {
-        // 处理插件消息通道（如果需要的话）
-        if (event.getIdentifier().getId().equals("velocitytablist:update")) {
-            // 处理来自后端服务器的更新请求
-            Optional<ServerConnection> connection = event.getSource().as(ServerConnection.class);
-            if (connection.isPresent()) {
-                crossServerManager.requestUpdate(connection.get().getServerInfo());
+        if (config.isCrossServerEnabled()) {
+            TabListUpdater updater = playerUpdaters.get(player);
+            if (updater != null) {
+                // 服务器切换时更新Tab列表
+                server.getScheduler().buildTask(plugin, () -> updater.updateTabList())
+                    .delay(java.time.Duration.ofMillis(500))
+                    .schedule();
             }
         }
     }
     
-    public void refreshPlayerTabList(Player player) {
-        PacketInterceptor interceptor = playerInterceptors.get(player);
-        if (interceptor != null) {
-            interceptor.refreshTabList();
+    @Subscribe
+    public void onDisconnect(DisconnectEvent event) {
+        Player player = event.getPlayer();
+        
+        // 清理更新器
+        TabListUpdater updater = playerUpdaters.remove(player);
+        if (updater != null) {
+            updater.cleanup();
         }
     }
     
-    public void refreshAllPlayers() {
-        playerInterceptors.values().forEach(PacketInterceptor::refreshTabList);
+    public void updateAllTabLists() {
+        // 更新所有玩家的Tab列表
+        playerUpdaters.values().forEach(TabListUpdater::updateTabList);
+    }
+    
+    public void handlePluginMessage(Player player, String channel, byte[] data) {
+        // 处理插件消息，用于与后端服务器通信
+        if ("velocitytablist:sync".equals(channel)) {
+            // 处理同步请求
+            infoManager.requestSync();
+        }
+    }
+    
+    public void shutdown() {
+        // 清理所有更新器
+        playerUpdaters.values().forEach(TabListUpdater::cleanup);
+        playerUpdaters.clear();
     }
 }

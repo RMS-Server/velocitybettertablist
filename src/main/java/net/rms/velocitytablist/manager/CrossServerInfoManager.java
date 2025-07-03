@@ -85,7 +85,9 @@ public class CrossServerInfoManager {
     @Subscribe
     public void onPlayerConnect(ServerPostConnectEvent event) {
         Player player = event.getPlayer();
-        String serverName = event.getServer().getServerInfo().getName();
+        String serverName = player.getCurrentServer()
+            .map(conn -> conn.getServerInfo().getName())
+            .orElse("unknown");
         
         // 更新玩家服务器缓存
         updatePlayerServerCache(player, serverName);
@@ -200,6 +202,17 @@ public class CrossServerInfoManager {
                 }
             } catch (Exception e) {
                 logger.error("更新服务器 {} 信息时发生错误", serverInfo.getName(), e);
+            }
+        }, scheduler);
+    }
+    
+    public void requestSync() {
+        CompletableFuture.runAsync(() -> {
+            try {
+                updateServerInfo();
+                logger.debug("已同步所有服务器信息");
+            } catch (Exception e) {
+                logger.error("同步服务器信息时发生错误", e);
             }
         }, scheduler);
     }

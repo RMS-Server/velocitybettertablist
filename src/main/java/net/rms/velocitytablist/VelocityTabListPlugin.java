@@ -52,7 +52,7 @@ public class VelocityTabListPlugin {
             crossServerManager = new CrossServerInfoManager(server, config, logger);
             
             // 初始化数据包处理器
-            packetHandler = new TabListPacketHandler(server, crossServerManager, config, logger);
+            packetHandler = new TabListPacketHandler(this, server, config, crossServerManager);
             
             // 注册事件监听器
             server.getEventManager().register(this, crossServerManager);
@@ -60,6 +60,13 @@ public class VelocityTabListPlugin {
             
             // 启动跨服务器信息收集
             crossServerManager.start();
+            
+            // 启动定期更新任务
+            server.getScheduler().buildTask(this, () -> {
+                if (config.isCrossServerEnabled()) {
+                    packetHandler.updateAllTabLists();
+                }
+            }).repeat(java.time.Duration.ofSeconds(config.getUpdateIntervalSeconds())).schedule();
             
             logger.info("VelocityTabList 插件初始化完成!");
             
@@ -74,6 +81,10 @@ public class VelocityTabListPlugin {
         
         if (crossServerManager != null) {
             crossServerManager.shutdown();
+        }
+        
+        if (packetHandler != null) {
+            packetHandler.shutdown();
         }
         
         logger.info("VelocityTabList 插件已关闭");

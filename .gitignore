@@ -42,6 +42,7 @@ logs/
 CLAUDE.md
 PROJECT.md
 .claude/
+debug/
 
 # Runtime
 run/

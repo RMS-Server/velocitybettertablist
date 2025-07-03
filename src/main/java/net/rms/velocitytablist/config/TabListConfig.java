@@ -58,24 +58,28 @@ public class TabListConfig {
     }
     
     private void setDefaultValues() {
-        // 跨服务器功能
-        config.node("cross-server", "enabled").set(crossServerEnabled);
-        config.node("cross-server", "show-player-count").set(showPlayerCount);
-        config.node("cross-server", "show-server-status").set(showServerStatus);
-        config.node("cross-server", "update-interval-seconds").set(updateIntervalSeconds);
-        config.node("cross-server", "max-players-per-server").set(maxPlayersPerServer);
-        
-        // 格式化
-        config.node("formatting", "current-server-prefix").set(currentServerPrefix);
-        config.node("formatting", "other-server-prefix").set(otherServerPrefix);
-        config.node("formatting", "server-header-format").set(serverHeaderFormat);
-        config.node("formatting", "cross-server-player-format").set(crossServerPlayerFormat);
-        config.node("formatting", "separator-text").set(separatorText);
-        
-        // 性能
-        config.node("performance", "enable-incremental-updates").set(enableIncrementalUpdates);
-        config.node("performance", "max-tab-list-size").set(maxTabListSize);
-        config.node("performance", "preserve-mod-info").set(preserveModInfo);
+        try {
+            // 跨服务器功能
+            config.node("cross-server", "enabled").set(crossServerEnabled);
+            config.node("cross-server", "show-player-count").set(showPlayerCount);
+            config.node("cross-server", "show-server-status").set(showServerStatus);
+            config.node("cross-server", "update-interval-seconds").set(updateIntervalSeconds);
+            config.node("cross-server", "max-players-per-server").set(maxPlayersPerServer);
+            
+            // 格式化
+            config.node("formatting", "current-server-prefix").set(currentServerPrefix);
+            config.node("formatting", "other-server-prefix").set(otherServerPrefix);
+            config.node("formatting", "server-header-format").set(serverHeaderFormat);
+            config.node("formatting", "cross-server-player-format").set(crossServerPlayerFormat);
+            config.node("formatting", "separator-text").set(separatorText);
+            
+            // 性能
+            config.node("performance", "enable-incremental-updates").set(enableIncrementalUpdates);
+            config.node("performance", "max-tab-list-size").set(maxTabListSize);
+            config.node("performance", "preserve-mod-info").set(preserveModInfo);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set default configuration values", e);
+        }
         
         // 添加注释
         config.node("cross-server").comment("跨服务器Tab栏功能配置");

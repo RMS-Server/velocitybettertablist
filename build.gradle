@@ -8,6 +8,7 @@ version = '1.0.0'
 description = 'Velocity Tab List Plugin for Cross-Server Player Display'
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
     maven {
         name = 'velocity'
@@ -34,9 +35,14 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 shadowJar {
     archiveFileName = "${project.name}-${project.version}.jar"
     relocate 'org.spongepowered.configurate', 'net.rms.velocitytablist.libs.configurate'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 build.dependsOn shadowJar
