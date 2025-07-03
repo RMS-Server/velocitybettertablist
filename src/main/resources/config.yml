@@ -1,0 +1,48 @@
+# VelocityTabList 插件配置文件
+# 作者: XRain
+# 项目地址: https://github.com/RMS-Server/velocitytab
+
+# 跨服务器Tab栏功能配置
+cross-server:
+  # 是否启用跨服务器功能
+  enabled: true
+  
+  # 是否显示玩家数量
+  show-player-count: true
+  
+  # 是否显示服务器状态
+  show-server-status: true
+  
+  # 更新间隔（秒）
+  update-interval-seconds: 30
+  
+  # 每个服务器最多显示的玩家数量
+  max-players-per-server: 10
+
+# 显示格式配置 - 支持 Minecraft 颜色代码
+formatting:
+  # 当前服务器玩家前缀
+  current-server-prefix: "§a➤ "
+  
+  # 其他服务器玩家前缀
+  other-server-prefix: "§7├ "
+  
+  # 服务器标题格式 (%s=服务器名, %d=在线人数)
+  server-header-format: "§e§l%s §7(%d人在线)"
+  
+  # 跨服务器玩家显示格式 (%s=玩家名, %s=服务器名)
+  cross-server-player-format: "§7├ %s §8(%s)"
+  
+  # 分隔符文本
+  separator-text: "§6§l=== Velocity 服务器列表 ==="
+
+# 性能优化配置
+performance:
+  # 启用增量更新
+  enable-incremental-updates: true
+  
+  # Tab列表最大条目数
+  max-tab-list-size: 100
+  
+  # 保留模组信息（如Carpet的TPS显示）
+  preserve-mod-info: true

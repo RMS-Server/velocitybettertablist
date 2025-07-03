@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group = 'net.rms.velocitytablist'
+version = '1.0.0'
+description = 'Velocity Tab List Plugin for Cross-Server Player Display'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'velocity'
+        url = 'https://nexus.velocitypowered.com/repository/maven-public/'
+    }
+}
+
+dependencies {
+    compileOnly 'com.velocitypowered:velocity-api:3.2.0-SNAPSHOT'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.2.0-SNAPSHOT'
+    
+    // Configuration library
+    implementation 'org.spongepowered:configurate-yaml:4.1.2'
+    implementation 'org.spongepowered:configurate-extra-guice:4.1.2'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    archiveFileName = "${project.name}-${project.version}.jar"
+    relocate 'org.spongepowered.configurate', 'net.rms.velocitytablist.libs.configurate'
+}
+
+build.dependsOn shadowJar
