@@ -23,8 +23,8 @@ public class TabListConfig {
     private String currentServerPrefix = "§a➤ ";
     private String otherServerPrefix = "§7├ ";
     private String serverHeaderFormat = "§e§l%s §7(%d人在线)";
-    private String crossServerPlayerFormat = "§7├ %s §8(%s)";
-    private String separatorText = "§6§l=== Velocity 服务器列表 ===";
+    private String crossServerPlayerFormat = "§7%s §8[%s]";
+    private String separatorText = "";
     
     // 性能配置
     private boolean enableIncrementalUpdates = true;
@@ -99,8 +99,8 @@ public class TabListConfig {
         currentServerPrefix = config.node("formatting", "current-server-prefix").getString("§a➤ ");
         otherServerPrefix = config.node("formatting", "other-server-prefix").getString("§7├ ");
         serverHeaderFormat = config.node("formatting", "server-header-format").getString("§e§l%s §7(%d人在线)");
-        crossServerPlayerFormat = config.node("formatting", "cross-server-player-format").getString("§7├ %s §8(%s)");
-        separatorText = config.node("formatting", "separator-text").getString("§6§l=== Velocity 服务器列表 ===");
+        crossServerPlayerFormat = config.node("formatting", "cross-server-player-format").getString("§7%s §8[%s]");
+        separatorText = config.node("formatting", "separator-text").getString("");
         
         // 性能
         enableIncrementalUpdates = config.node("performance", "enable-incremental-updates").getBoolean(true);

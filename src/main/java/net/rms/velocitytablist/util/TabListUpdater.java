@@ -120,7 +120,7 @@ public class TabListUpdater {
     
     private TabListEntry createSeparatorEntry(TabList tabList) {
         UUID uuid = uuidGenerator.generateSeparatorUUID("main");
-        GameProfile profile = new GameProfile(uuid, "", Collections.emptyList());
+        GameProfile profile = new GameProfile(uuid, "separator", Collections.emptyList());
         
         Component displayName = Component.text(config.getSeparatorText())
             .color(NamedTextColor.GOLD);
@@ -136,7 +136,7 @@ public class TabListUpdater {
     
     private TabListEntry createServerHeaderEntry(TabList tabList, RegisteredServer server, int playerCount) {
         UUID uuid = uuidGenerator.generateServerHeaderUUID(server.getServerInfo().getName());
-        GameProfile profile = new GameProfile(uuid, "", Collections.emptyList());
+        GameProfile profile = new GameProfile(uuid, server.getServerInfo().getName(), Collections.emptyList());
         
         String format = config.getServerHeaderFormat();
         String displayText = String.format(format, server.getServerInfo().getName(), playerCount);
@@ -158,7 +158,7 @@ public class TabListUpdater {
             serverPlayer.getUniqueId(), 
             server.getServerInfo().getName()
         );
-        GameProfile profile = new GameProfile(uuid, "", Collections.emptyList());
+        GameProfile profile = new GameProfile(uuid, serverPlayer.getUsername(), Collections.emptyList());
         
         String format = config.getCrossServerPlayerFormat();
         String displayText = String.format(format, 
@@ -180,7 +180,7 @@ public class TabListUpdater {
     
     private TabListEntry createMorePlayersEntry(TabList tabList, int remainingCount) {
         UUID uuid = uuidGenerator.generateSeparatorUUID("more_players");
-        GameProfile profile = new GameProfile(uuid, "", Collections.emptyList());
+        GameProfile profile = new GameProfile(uuid, "more_players", Collections.emptyList());
         
         Component displayName = Component.text("§7... 还有 " + remainingCount + " 名玩家")
             .color(NamedTextColor.GRAY);
