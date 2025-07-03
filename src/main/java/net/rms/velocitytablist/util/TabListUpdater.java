@@ -59,8 +59,10 @@ public class TabListUpdater {
     private void cleanupVirtualEntries(TabList tabList) {
         // 移除所有虚拟条目
         for (UUID uuid : virtualEntries.keySet()) {
-            if (tabList.getEntry(uuid).isPresent()) {
+            try {
                 tabList.removeEntry(uuid);
+            } catch (Exception e) {
+                // 忽略移除不存在条目时的异常
             }
         }
         virtualEntries.clear();
@@ -73,8 +75,8 @@ public class TabListUpdater {
         
         List<TabListEntry> entriesToAdd = new ArrayList<>();
         
-        // 添加分隔符
-        if (config.getSeparatorText() != null && !config.getSeparatorText().isEmpty()) {
+        // 添加分隔符（仅当配置了非空文本时）
+        if (config.getSeparatorText() != null && !config.getSeparatorText().trim().isEmpty()) {
             entriesToAdd.add(createSeparatorEntry(tabList));
         }
         
@@ -93,10 +95,7 @@ public class TabListUpdater {
                 continue;
             }
             
-            // 添加服务器标题
-            entriesToAdd.add(createServerHeaderEntry(tabList, server, serverPlayers.size()));
-            
-            // 添加服务器玩家（限制数量）
+            // 直接添加服务器玩家（限制数量）不显示服务器标题
             int maxPlayers = config.getMaxPlayersPerServer();
             int count = 0;
             

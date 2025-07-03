@@ -31,10 +31,10 @@ formatting:
   server-header-format: "§e§l%s §7(%d人在线)"
   
   # 跨服务器玩家显示格式 (%s=玩家名, %s=服务器名)
-  cross-server-player-format: "§7├ %s §8(%s)"
+  cross-server-player-format: "§7%s §8[%s]"
   
-  # 分隔符文本
-  separator-text: "§6§l=== Velocity 服务器列表 ==="
+  # 分隔符文本 (设置为空字符串禁用分隔符)
+  separator-text: ""
 
 # 性能优化配置
 performance:
