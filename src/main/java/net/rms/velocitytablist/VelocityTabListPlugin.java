@@ -63,9 +63,7 @@ public class VelocityTabListPlugin {
             
             // 启动定期更新任务
             server.getScheduler().buildTask(this, () -> {
-                if (config.isCrossServerEnabled()) {
-                    packetHandler.updateAllTabLists();
-                }
+                packetHandler.updateAllTabLists();
             }).repeat(java.time.Duration.ofSeconds(config.getUpdateIntervalSeconds())).schedule();
             
             logger.info("VelocityTabList 插件初始化完成!");

@@ -13,7 +13,6 @@ public class TabListConfig {
     private CommentedConfigurationNode config;
     
     // 跨服务器功能配置
-    private boolean crossServerEnabled = true;
     private boolean showPlayerCount = true;
     private boolean showServerStatus = true;
     private int updateIntervalSeconds = 30;
@@ -60,7 +59,6 @@ public class TabListConfig {
     private void setDefaultValues() {
         try {
             // 跨服务器功能
-            config.node("cross-server", "enabled").set(crossServerEnabled);
             config.node("cross-server", "show-player-count").set(showPlayerCount);
             config.node("cross-server", "show-server-status").set(showServerStatus);
             config.node("cross-server", "update-interval-seconds").set(updateIntervalSeconds);
@@ -89,7 +87,6 @@ public class TabListConfig {
     
     private void loadValues() {
         // 跨服务器功能
-        crossServerEnabled = config.node("cross-server", "enabled").getBoolean(true);
         showPlayerCount = config.node("cross-server", "show-player-count").getBoolean(true);
         showServerStatus = config.node("cross-server", "show-server-status").getBoolean(true);
         updateIntervalSeconds = config.node("cross-server", "update-interval-seconds").getInt(30);
@@ -109,7 +106,6 @@ public class TabListConfig {
     }
     
     // Getter 方法
-    public boolean isCrossServerEnabled() { return crossServerEnabled; }
     public boolean isShowPlayerCount() { return showPlayerCount; }
     public boolean isShowServerStatus() { return showServerStatus; }
     public int getUpdateIntervalSeconds() { return updateIntervalSeconds; }

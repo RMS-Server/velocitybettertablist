@@ -35,30 +35,22 @@ public class TabListPacketHandler {
     public void onPostLogin(PostLoginEvent event) {
         Player player = event.getPlayer();
         
-        if (config.isCrossServerEnabled()) {
-            // 为玩家创建Tab列表更新器
-            TabListUpdater updater = new TabListUpdater(player, plugin, infoManager);
-            playerUpdaters.put(player, updater);
-            
-            // 延迟初始化Tab列表，确保服务器玩家列表已稳定
-            server.getScheduler().buildTask(plugin, () -> updater.updateTabList())
-                .delay(java.time.Duration.ofSeconds(2))
-                .schedule();
-        }
+        // 为玩家创建Tab列表更新器
+        TabListUpdater updater = new TabListUpdater(player, plugin, infoManager);
+        playerUpdaters.put(player, updater);
+        
+        // 立即初始化Tab列表
+        updater.updateTabList();
     }
     
     @Subscribe
     public void onServerConnect(ServerPostConnectEvent event) {
         Player player = event.getPlayer();
         
-        if (config.isCrossServerEnabled()) {
-            TabListUpdater updater = playerUpdaters.get(player);
-            if (updater != null) {
-                // 服务器切换时更新Tab列表，延迟确保新服务器数据已加载
-                server.getScheduler().buildTask(plugin, () -> updater.updateTabList())
-                    .delay(java.time.Duration.ofSeconds(1))
-                    .schedule();
-            }
+        TabListUpdater updater = playerUpdaters.get(player);
+        if (updater != null) {
+            // 服务器切换时立即更新Tab列表
+            updater.updateTabList();
         }
     }
     

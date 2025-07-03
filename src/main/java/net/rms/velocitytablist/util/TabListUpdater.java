@@ -35,7 +35,7 @@ public class TabListUpdater {
     }
     
     public void updateTabList() {
-        if (isUpdating || !config.isCrossServerEnabled()) {
+        if (isUpdating) {
             return;
         }
         
@@ -69,9 +69,6 @@ public class TabListUpdater {
     }
     
     private void addCrossServerEntries(TabList tabList) {
-        if (!config.isCrossServerEnabled()) {
-            return;
-        }
         
         List<TabListEntry> entriesToAdd = new ArrayList<>();
         
