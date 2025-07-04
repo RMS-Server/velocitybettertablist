@@ -114,7 +114,7 @@ public class ConfigManager {
     }
     
     public boolean isAutoDownload() {
-        return config.node("auto-update", "auto-download").getBoolean(false);
+        return config.node("auto-update", "auto-download").getBoolean(true);
     }
     
     public boolean isCheckOnStartup() {
