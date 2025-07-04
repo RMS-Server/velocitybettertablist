@@ -7,8 +7,10 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.rms.velocitytablist.config.ConfigManager;
 import net.rms.velocitytablist.handler.TabListPacketHandler;
 import net.rms.velocitytablist.manager.CrossServerInfoManager;
+import net.rms.velocitytablist.manager.UpdateManager;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -27,8 +29,10 @@ public class VelocityTabListPlugin {
     private final Logger logger;
     private final Path dataDirectory;
     
+    private ConfigManager configManager;
     private CrossServerInfoManager crossServerManager;
     private TabListPacketHandler packetHandler;
+    private UpdateManager updateManager;
     
     @Inject
     public VelocityTabListPlugin(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -42,6 +46,24 @@ public class VelocityTabListPlugin {
         logger.info("正在初始化 VelocityTabList 插件...");
         
         try {
+            // 初始化配置管理器
+            configManager = new ConfigManager(dataDirectory, logger);
+            
+            // 初始化自动更新管理器
+            String currentVersion = getCurrentVersion();
+            updateManager = new UpdateManager(
+                server, logger, currentVersion,
+                configManager.getVersionUrl(),
+                configManager.getGithubRepo(),
+                configManager.isAutoUpdateEnabled(),
+                configManager.isAutoDownload(),
+                configManager.isCheckOnStartup(),
+                configManager.getCheckIntervalHours()
+            );
+            
+            // 启动自动更新管理器
+            updateManager.start();
+            
             // 初始化跨服务器信息管理器
             crossServerManager = new CrossServerInfoManager(server, logger);
             
@@ -55,10 +77,10 @@ public class VelocityTabListPlugin {
             // 启动跨服务器信息收集
             crossServerManager.start();
             
-            // 启动定期更新任务（每30秒）
+            // 启动定期更新任务（使用配置文件中的间隔）
             server.getScheduler().buildTask(this, () -> {
                 packetHandler.updateAllTabLists();
-            }).repeat(java.time.Duration.ofSeconds(30)).schedule();
+            }).repeat(java.time.Duration.ofSeconds(configManager.getUpdateIntervalSeconds())).schedule();
             
             logger.info("VelocityTabList 插件初始化完成!");
             
@@ -70,6 +92,10 @@ public class VelocityTabListPlugin {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         logger.info("正在关闭 VelocityTabList 插件...");
+        
+        if (updateManager != null) {
+            updateManager.shutdown();
+        }
         
         if (crossServerManager != null) {
             crossServerManager.shutdown();
@@ -88,6 +114,32 @@ public class VelocityTabListPlugin {
     
     public Logger getLogger() {
         return logger;
+    }
+    
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+    
+    public UpdateManager getUpdateManager() {
+        return updateManager;
+    }
+    
+    private String getCurrentVersion() {
+        try {
+            Path versionFile = dataDirectory.getParent().resolve("plugin.version");
+            if (!java.nio.file.Files.exists(versionFile)) {
+                return "1.0.0";
+            }
+            
+            String version = java.nio.file.Files.readString(versionFile).trim();
+            if (version.startsWith("V ")) {
+                version = version.substring(2);
+            }
+            return version;
+        } catch (Exception e) {
+            logger.warn("无法读取版本文件，使用默认版本", e);
+            return "1.0.0";
+        }
     }
     
 }

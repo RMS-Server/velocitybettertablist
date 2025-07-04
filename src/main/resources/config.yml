@@ -1,48 +1,23 @@
 # VelocityTabList 插件配置文件
 # 作者: XRain
-# 项目地址: https://github.com/RMS-Server/velocitytab
+# 项目地址: https://github.com/RMS-Server/velocitybettertablist
 
-# 跨服务器Tab栏功能配置
-cross-server:
-  # 是否启用跨服务器功能
+# 自动更新配置
+auto-update:
+  # 是否启用自动更新检查
   enabled: true
   
-  # 是否显示玩家数量
-  show-player-count: true
+  # 版本检查间隔（小时）
+  check-interval-hours: 24
   
-  # 是否显示服务器状态
-  show-server-status: true
+  # 是否自动下载更新
+  auto-download: false
   
-  # 更新间隔（秒）
-  update-interval-seconds: 30
+  # 是否在启动时检查更新
+  check-on-startup: true
   
-  # 每个服务器最多显示的玩家数量
-  max-players-per-server: 10
-
-# 显示格式配置 - 支持 Minecraft 颜色代码
-formatting:
-  # 当前服务器玩家前缀
-  current-server-prefix: "§a➤ "
+  # GitHub仓库信息
+  github-repo: "RMS-Server/velocitybettertablist"
   
-  # 其他服务器玩家前缀
-  other-server-prefix: "§7├ "
-  
-  # 服务器标题格式 (%s=服务器名, %d=在线人数)
-  server-header-format: "§e§l%s §7(%d人在线)"
-  
-  # 跨服务器玩家显示格式 (%s=玩家名, %s=服务器名)
-  cross-server-player-format: "§7%s §8[%s]"
-  
-  # 分隔符文本 (设置为空字符串禁用分隔符)
-  separator-text: ""
-
-# 性能优化配置
-performance:
-  # 启用增量更新
-  enable-incremental-updates: true
-  
-  # Tab列表最大条目数
-  max-tab-list-size: 100
-  
-  # 保留模组信息（如Carpet的TPS显示）
-  preserve-mod-info: true
+  # 自动更新URL（用于获取plugin.version文件）
+  version-url: "https://raw.githubusercontent.com/RMS-Server/velocitybettertablist/main/plugin.version"
