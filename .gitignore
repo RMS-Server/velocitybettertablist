@@ -4,7 +4,7 @@ build/
 gradle-app.setting
 gradlew
 gradlew.bat
-gradle/wrapper/
+gradle/
 
 # IDE
 .idea/
