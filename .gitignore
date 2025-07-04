@@ -2,10 +2,9 @@
 .gradle/
 build/
 gradle-app.setting
-!gradle-wrapper.jar
-!gradle-wrapper.properties
-!gradle/wrapper/gradle-wrapper.jar
-!gradle/wrapper/gradle-wrapper.properties
+gradlew
+gradlew.bat
+gradle/wrapper/
 
 # IDE
 .idea/
