@@ -1,6 +1,7 @@
 package net.rms.velocitytablist.manager;
 
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.rms.velocitytablist.VelocityTabListPlugin;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class UpdateManager {
     
+    private final VelocityTabListPlugin plugin;
     private final ProxyServer server;
     private final Logger logger;
     private final String currentVersion;
@@ -31,10 +33,11 @@ public class UpdateManager {
     private final HttpClient httpClient;
     private ScheduledExecutorService scheduler;
     
-    public UpdateManager(ProxyServer server, Logger logger, 
+    public UpdateManager(VelocityTabListPlugin plugin, ProxyServer server, Logger logger, 
                         String currentVersion, String versionUrl, String githubRepo,
                         boolean autoUpdateEnabled, boolean autoDownload, 
                         boolean checkOnStartup, int checkIntervalHours) {
+        this.plugin = plugin;
         this.server = server;
         this.logger = logger;
         this.currentVersion = currentVersion;
@@ -58,7 +61,7 @@ public class UpdateManager {
         
         logger.info("启动自动更新管理器...");
         
-        scheduler = server.getScheduler().createScheduledExecutorService(this);
+        scheduler = server.getScheduler().createScheduledExecutorService(plugin);
         
         if (checkOnStartup) {
             checkForUpdates();

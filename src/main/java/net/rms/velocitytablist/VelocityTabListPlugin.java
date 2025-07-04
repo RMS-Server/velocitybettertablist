@@ -52,7 +52,7 @@ public class VelocityTabListPlugin {
             // 初始化自动更新管理器
             String currentVersion = getCurrentVersion();
             updateManager = new UpdateManager(
-                server, logger, currentVersion,
+                this, server, logger, currentVersion,
                 configManager.getVersionUrl(),
                 configManager.getGithubRepo(),
                 configManager.isAutoUpdateEnabled(),
