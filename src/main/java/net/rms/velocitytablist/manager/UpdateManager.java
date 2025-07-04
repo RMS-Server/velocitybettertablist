@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +62,11 @@ public class UpdateManager {
         
         logger.info("启动自动更新管理器...");
         
-        scheduler = server.getScheduler().createScheduledExecutorService(plugin);
+        // 使用 Velocity 推荐的 buildTask API 替代 createScheduledExecutorService
+        // scheduler = server.getScheduler().createScheduledExecutorService(plugin);
+        
+        // 使用标准的 ScheduledExecutorService，在 shutdown 时手动清理
+        scheduler = Executors.newScheduledThreadPool(1);
         
         if (checkOnStartup) {
             checkForUpdates();
