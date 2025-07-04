@@ -7,7 +7,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import net.rms.velocitytablist.config.TabListConfig;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 public class CrossServerInfoManager {
     
     private final ProxyServer server;
-    private final TabListConfig config;
     private final Logger logger;
     
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -29,9 +27,8 @@ public class CrossServerInfoManager {
     private ScheduledFuture<?> updateTask;
     private volatile boolean isRunning = false;
     
-    public CrossServerInfoManager(ProxyServer server, TabListConfig config, Logger logger) {
+    public CrossServerInfoManager(ProxyServer server, Logger logger) {
         this.server = server;
-        this.config = config;
         this.logger = logger;
     }
     
@@ -46,15 +43,15 @@ public class CrossServerInfoManager {
         // 初始化服务器信息缓存
         updateServerInfo();
         
-        // 启动定期更新任务
+        // 启动定期更新任务（每30秒）
         updateTask = scheduler.scheduleAtFixedRate(
                 this::updateServerInfo,
                 0,
-                config.getUpdateIntervalSeconds(),
+                30,
                 TimeUnit.SECONDS
         );
         
-        logger.info("跨服务器信息收集器已启动，更新间隔: {}秒", config.getUpdateIntervalSeconds());
+        logger.info("跨服务器信息收集器已启动，更新间隔: 30秒");
     }
     
     public void shutdown() {
@@ -142,8 +139,8 @@ public class CrossServerInfoManager {
             List<Player> players = serverPlayerCache.getOrDefault(serverName, new ArrayList<>());
             
             // 限制每个服务器显示的玩家数量
-            if (players.size() > config.getMaxPlayersPerServer()) {
-                players = players.subList(0, config.getMaxPlayersPerServer());
+            if (players.size() > 10) {
+                players = players.subList(0, 10);
             }
             
             result.put(registeredServer, new ArrayList<>(players));
@@ -185,7 +182,7 @@ public class CrossServerInfoManager {
         }
         
         long timeSinceUpdate = System.currentTimeMillis() - lastUpdate;
-        return timeSinceUpdate < (config.getUpdateIntervalSeconds() * 2000); // 2倍更新间隔作为超时
+        return timeSinceUpdate < (30 * 2000); // 2倍更新间隔作为超时
     }
     
     public void requestUpdate(ServerInfo serverInfo) {

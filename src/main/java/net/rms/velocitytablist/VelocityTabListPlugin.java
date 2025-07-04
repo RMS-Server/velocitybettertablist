@@ -7,7 +7,6 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.rms.velocitytablist.config.TabListConfig;
 import net.rms.velocitytablist.handler.TabListPacketHandler;
 import net.rms.velocitytablist.manager.CrossServerInfoManager;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import java.nio.file.Path;
     version = "1.0.0",
     description = "Cross-server tab list enhancement for Velocity",
     authors = {"XRain"},
-    url = "https://github.com/RMS-Server/velocitytab"
+    url = "https://github.com/RMS-Server/velocitybettertablist"
 )
 public class VelocityTabListPlugin {
     
@@ -28,7 +27,6 @@ public class VelocityTabListPlugin {
     private final Logger logger;
     private final Path dataDirectory;
     
-    private TabListConfig config;
     private CrossServerInfoManager crossServerManager;
     private TabListPacketHandler packetHandler;
     
@@ -44,15 +42,11 @@ public class VelocityTabListPlugin {
         logger.info("正在初始化 VelocityTabList 插件...");
         
         try {
-            // 加载配置
-            config = new TabListConfig(dataDirectory);
-            config.load();
-            
             // 初始化跨服务器信息管理器
-            crossServerManager = new CrossServerInfoManager(server, config, logger);
+            crossServerManager = new CrossServerInfoManager(server, logger);
             
             // 初始化数据包处理器
-            packetHandler = new TabListPacketHandler(this, server, config, crossServerManager);
+            packetHandler = new TabListPacketHandler(this, server, crossServerManager);
             
             // 注册事件监听器
             server.getEventManager().register(this, crossServerManager);
@@ -61,10 +55,10 @@ public class VelocityTabListPlugin {
             // 启动跨服务器信息收集
             crossServerManager.start();
             
-            // 启动定期更新任务
+            // 启动定期更新任务（每30秒）
             server.getScheduler().buildTask(this, () -> {
                 packetHandler.updateAllTabLists();
-            }).repeat(java.time.Duration.ofSeconds(config.getUpdateIntervalSeconds())).schedule();
+            }).repeat(java.time.Duration.ofSeconds(30)).schedule();
             
             logger.info("VelocityTabList 插件初始化完成!");
             
@@ -96,7 +90,4 @@ public class VelocityTabListPlugin {
         return logger;
     }
     
-    public TabListConfig getConfig() {
-        return config;
-    }
 }

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Cross-server tab list enhancement for Velocity",
   "authors": ["XRain"],
-  "url": "https://github.com/RMS-Server/velocitytab",
+  "url": "https://github.com/RMS-Server/velocitybettertablist",
   "main": "net.rms.velocitytablist.VelocityTabListPlugin",
   "dependencies": []
 }

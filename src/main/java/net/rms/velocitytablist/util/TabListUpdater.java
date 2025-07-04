@@ -8,7 +8,6 @@ import com.velocitypowered.api.util.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.rms.velocitytablist.VelocityTabListPlugin;
-import net.rms.velocitytablist.config.TabListConfig;
 import net.rms.velocitytablist.manager.CrossServerInfoManager;
 
 import java.util.*;
@@ -20,7 +19,6 @@ public class TabListUpdater {
     private final Player player;
     private final VelocityTabListPlugin plugin;
     private final CrossServerInfoManager infoManager;
-    private final TabListConfig config;
     private final UUIDGenerator uuidGenerator;
     
     private final ConcurrentMap<UUID, TabListEntry> virtualEntries = new ConcurrentHashMap<>();
@@ -30,7 +28,6 @@ public class TabListUpdater {
         this.player = player;
         this.plugin = plugin;
         this.infoManager = infoManager;
-        this.config = plugin.getConfig();
         this.uuidGenerator = new UUIDGenerator();
     }
     
@@ -72,8 +69,9 @@ public class TabListUpdater {
         
         List<TabListEntry> entriesToAdd = new ArrayList<>();
         
-        // 添加分隔符（仅当配置了非空文本时）
-        if (config.getSeparatorText() != null && !config.getSeparatorText().trim().isEmpty()) {
+        // 添加分隔符
+        String separatorText = "";
+        if (separatorText != null && !separatorText.trim().isEmpty()) {
             entriesToAdd.add(createSeparatorEntry(tabList));
         }
         
@@ -93,7 +91,7 @@ public class TabListUpdater {
             }
             
             // 直接添加服务器玩家（限制数量）不显示服务器标题
-            int maxPlayers = config.getMaxPlayersPerServer();
+            int maxPlayers = 10; // 默认每服务器显示10个玩家
             int count = 0;
             
             for (Player serverPlayer : serverPlayers) {
@@ -119,7 +117,7 @@ public class TabListUpdater {
         UUID uuid = uuidGenerator.generateSeparatorUUID("main");
         GameProfile profile = new GameProfile(uuid, "separator", Collections.emptyList());
         
-        Component displayName = Component.text(config.getSeparatorText())
+        Component displayName = Component.text("")
             .color(NamedTextColor.GOLD);
         
         return TabListEntry.builder()
@@ -135,7 +133,7 @@ public class TabListUpdater {
         UUID uuid = uuidGenerator.generateServerHeaderUUID(server.getServerInfo().getName());
         GameProfile profile = new GameProfile(uuid, server.getServerInfo().getName(), Collections.emptyList());
         
-        String format = config.getServerHeaderFormat();
+        String format = "§e§l%s §7(%d人在线)"; // 服务器标题格式
         String displayText = String.format(format, server.getServerInfo().getName(), playerCount);
         
         Component displayName = Component.text(displayText)
@@ -157,7 +155,7 @@ public class TabListUpdater {
         );
         GameProfile profile = new GameProfile(uuid, serverPlayer.getUsername(), Collections.emptyList());
         
-        String format = config.getCrossServerPlayerFormat();
+        String format = "§7%s §8[%s]"; // 跨服务器玩家格式
         String displayText = String.format(format, 
             serverPlayer.getUsername(), 
             server.getServerInfo().getName()

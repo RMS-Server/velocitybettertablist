@@ -7,7 +7,6 @@ import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.rms.velocitytablist.VelocityTabListPlugin;
-import net.rms.velocitytablist.config.TabListConfig;
 import net.rms.velocitytablist.manager.CrossServerInfoManager;
 import net.rms.velocitytablist.util.TabListUpdater;
 
@@ -18,16 +17,14 @@ public class TabListPacketHandler {
     
     private final VelocityTabListPlugin plugin;
     private final ProxyServer server;
-    private final TabListConfig config;
     private final CrossServerInfoManager infoManager;
     
     private final ConcurrentMap<Player, TabListUpdater> playerUpdaters = new ConcurrentHashMap<>();
     
     public TabListPacketHandler(VelocityTabListPlugin plugin, ProxyServer server, 
-                              TabListConfig config, CrossServerInfoManager infoManager) {
+                              CrossServerInfoManager infoManager) {
         this.plugin = plugin;
         this.server = server;
-        this.config = config;
         this.infoManager = infoManager;
     }
     
