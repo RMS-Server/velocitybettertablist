@@ -38,7 +38,7 @@ public class CrossServerInfoManager {
         }
         
         isRunning = true;
-        logger.info("启动跨服务器信息收集器...");
+        logger.debug("启动信息收集器...");
         
         // 初始化服务器信息缓存
         updateServerInfo();
@@ -51,7 +51,7 @@ public class CrossServerInfoManager {
                 TimeUnit.SECONDS
         );
         
-        logger.info("跨服务器信息收集器已启动，更新间隔: 30秒");
+        logger.debug("信息收集器已启动，更新间隔: 30秒");
     }
     
     public void shutdown() {
@@ -60,7 +60,7 @@ public class CrossServerInfoManager {
         }
         
         isRunning = false;
-        logger.info("正在关闭跨服务器信息收集器...");
+        logger.debug("正在关闭信息收集器...");
         
         if (updateTask != null && !updateTask.isCancelled()) {
             updateTask.cancel(false);
@@ -76,7 +76,7 @@ public class CrossServerInfoManager {
             Thread.currentThread().interrupt();
         }
         
-        logger.info("跨服务器信息收集器已关闭");
+        logger.debug("信息收集器已关闭");
     }
     
     @Subscribe

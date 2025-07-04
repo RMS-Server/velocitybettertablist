@@ -70,13 +70,13 @@ public class TabListPacketHandler {
     public void handlePluginMessage(Player player, String channel, byte[] data) {
         // 处理插件消息，用于与后端服务器通信
         if ("velocitytablist:sync".equals(channel)) {
-            // 处理同步请求
+            
             infoManager.requestSync();
         }
     }
     
     public void shutdown() {
-        // 清理所有更新器
+        
         playerUpdaters.values().forEach(TabListUpdater::cleanup);
         playerUpdaters.clear();
     }
